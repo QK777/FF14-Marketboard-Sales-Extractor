@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FF14 Marketboard Sales Extractor</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <div class="titleBlock">
+        <h1>FF14 Log Item Extractor</h1>
+        <p class="sub">売却ログ（○○マーケットに…出品した…が売れ…）からアイテム名だけを抽出。貼り付け or ファイル監視。</p>
+      </div>
+    </header>
+
+    <!-- ✅ リアルタイム監視 -->
+    <section class="card">
+    <input id="fileFallback" type="file" accept=".log,.txt,text/plain" style="display:none" />
+
+      <div class="monitorHead">
+        <div>
+          <div class="label">リアルタイム監視（ACTログファイル）</div>
+          <div id="monitorStatus" class="status idle">未接続</div>
+        </div>
+
+        <div class="monitorControls">
+          <select id="encodingSelect" class="select small" aria-label="文字コード">
+            <option value="utf-8">UTF-8</option>
+            <option value="utf-8-sig">UTF-8（BOMあり）</option>
+            <option value="shift-jis">Shift-JIS</option>
+          </select>
+
+          <label class="check">
+            <input type="checkbox" id="fromStartToggle" />
+            <span>先頭から読む</span>
+          </label>
+
+          <button id="pickStartBtn" class="btn primary">ログを選んで監視開始</button>
+          <button id="stopWatchBtn" class="btn danger" disabled>停止</button>
+        </div>
+      </div>
+
+      <div class="hint">
+        ※Chrome/Edge推奨。監視は「追記分」を自動で追加します（同一行hashは弾きます）。<br>
+        ActlogはWindowsのシステムファイルを含まない場所に変更してください。（初期設定はappdata下）
+      </div>
+    </section>
+
+    <!-- 手動貼り付け -->
+    <section class="card">
+      <label class="label">ログ貼り付け（手動）</label>
+      <textarea id="logInput" placeholder="ここにFF14のログを貼り付け…（複数行OK）"></textarea>
+
+      <div class="controls">
+        <button id="extractBtn" class="btn primary">Extract</button>
+        <button id="clearBtn" class="btn">Clear logs</button>
+
+        <div class="spacer"></div>
+
+        <label class="check">
+          <input type="checkbox" id="dedupeToggle" checked />
+          <span>重複をまとめる</span>
+        </label>
+      </div>
+
+      <div class="hint">
+        Extractは「結果に追加」されます。同一ログのExtractは弾きます。
+      </div>
+    </section>
+
+    <!-- 出力 -->
+    <section class="card">
+      <div class="outHead">
+        <div>
+          <div class="label">抽出結果</div>
+          <div id="stats" class="stats">0件</div>
+        </div>
+
+        <div class="outActions">
+          <div class="sortBox">
+            <select id="sortSelect" class="select" aria-label="並び替え">
+              <option value="order">出現順</option>
+              <option value="nameAsc">昇順</option>
+              <option value="nameDesc">降順</option>
+            </select>
+          </div>
+
+          <button id="copyAllBtn" class="btn">Copy All</button>
+          <button id="clearOutBtn" class="btn danger">Clear Results</button>
+        </div>
+      </div>
+
+      <div id="output" class="output"></div>
+
+    <template id="rowTpl">
+      <div class="row" role="button" tabindex="0" data-click="copy">
+        <div class="name">
+          <span class="name-text"></span>
+          <span class="count-badge" aria-label="count"></span>
+        </div>
+
+        <div class="rowActions">
+          <button class="btn mini danger delete" type="button" aria-label="Delete">Del</button>
+        </div>
+      </div>
+    </template>
+    
+    </section>
+
+    <footer class="foot">
+      <span class="muted">ローカルストレージ保存 / サーバー不要（ただし監視は https での実行推奨）</span>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
